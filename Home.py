@@ -26,44 +26,7 @@ st.set_page_config(
     layout="wide",
 )
 
-# === SISTEMA DE GAMIFICAÇÃO ===
-# Inicializar session state para pontos, badges e progresso
-if 'pontos' not in st.session_state:
-    st.session_state.pontos = 0
-if 'badges' not in st.session_state:
-    st.session_state.badges = []
-if 'missoes_completas' not in st.session_state:
-    st.session_state.missoes_completas = set()
-if 'quiz_respondido' not in st.session_state:
-    st.session_state.quiz_respondido = {}
-if 'vidas' not in st.session_state:
-    st.session_state.vidas = 3
-
-# Função para calcular nível
-def calcular_nivel(pontos):
-    if pontos < 100:
-        return "🥉 Iniciante", 0
-    elif pontos < 300:
-        return "🥈 Conhecedor", 1
-    elif pontos < 500:
-        return "🥇 Expert", 2
-    else:
-        return "👑 Mestre Cervejeiro", 3
-
-# Função para adicionar pontos
-def ganhar_pontos(quantidade, motivo):
-    st.session_state.pontos += quantidade
-    return f"✨ +{quantidade} pontos! {motivo}"
-
-# Função para ganhar badge
-def ganhar_badge(nome, emoji):
-    if nome not in st.session_state.badges:
-        st.session_state.badges.append(nome)
-        st.balloons()
-        return True
-    return False
-
-# CSS Dark Mode Lúdico
+# CSS Dark Mode
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
@@ -696,50 +659,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# === PAINEL DE JOGADOR ===
-nivel_nome, nivel_num = calcular_nivel(st.session_state.pontos)
-progresso_nivel = min((st.session_state.pontos % 100) if nivel_num < 3 else 100, 100)
-
-st.markdown(f"""
-<div class="player-panel fade-in">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div>
-            <h3 style="color: #a78bfa; margin: 0; font-size: 1.5rem;">🎮 SEU PROGRESSO</h3>
-            <p style="color: #c4b5fd; margin: 0.5rem 0 0 0;">Explore, aprenda e conquiste badges!</p>
-        </div>
-        <div style="text-align: right;">
-            <div style="font-size: 2.5rem; font-weight: 800; color: #ffffff;">{st.session_state.pontos}</div>
-            <div style="color: #a78bfa; font-weight: 600;">PONTOS</div>
-        </div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-col_nivel, col_vidas, col_badges = st.columns([2, 1, 2])
-
-with col_nivel:
-    st.markdown(f"**Nível Atual:** {nivel_nome}")
-    st.progress(progresso_nivel / 100)
-    pontos_proximo = 100 - (st.session_state.pontos % 100) if nivel_num < 3 else 0
-    if pontos_proximo > 0:
-        st.caption(f"Faltam {pontos_proximo} pontos para o próximo nível")
-    else:
-        st.caption("✨ Nível máximo atingido!")
-
-with col_vidas:
-    vidas_atual = max(0, min(3, st.session_state.vidas))
-    vidas_display = "❤️" * vidas_atual + "🖤" * (3 - vidas_atual)
-    st.markdown(f"**Vidas:** <span class='vida'>{vidas_display}</span>", unsafe_allow_html=True)
-
-with col_badges:
-    if len(st.session_state.badges) > 0:
-        badges_display = " ".join([f"<span class='badge'>{badge}</span>" for badge in st.session_state.badges[:5]])
-        st.markdown(f"**Badges:** {badges_display}", unsafe_allow_html=True)
-    else:
-        st.markdown("**Badges:** Nenhuma ainda. Complete missões para ganhar!")
-
-st.markdown("---")
-
 # === KPIs ===
 st.markdown('<div class="section-title">📈 Indicadores Principais</div>', unsafe_allow_html=True)
 
@@ -785,58 +704,18 @@ for idx, kpi in enumerate(kpis):
 st.markdown("---")
 
 # === STORYTELLING INTERATIVO ===
-st.markdown('<div class="section-title">📖 🎯 MISSÃO 1: Descubra o Boom Zero</div>', unsafe_allow_html=True)
+st.markdown('<div class="section-title">📖 Descubra o Boom Zero</div>', unsafe_allow_html=True)
 
-# Pergunta 1: E aí, pegou?
 st.markdown("""
-<div class="missao-card fade-in">
-    <h3 style="color: #10b981; margin-top: 0;">❓ DESAFIO 1: E aí, a cerveja zero pegou no Brasil?</h3>
-    <p style="color: #a7f3d0; margin-bottom: 0;">🎁 Recompensa: +25 pontos • 🟢 Dificuldade: Fácil</p>
+<div class="info-box" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 182, 212, 0.2)); border-color: #10b981;">
+    <strong style="color: #10b981; font-size: 1.2rem;">🚀 A cerveja zero EXPLODIU no Brasil!</strong>
+    <p style="margin-top: 0.5rem;">
+    • <b>+537% em 2024:</b> 757 milhões de litros<br>
+    • <b>🏆 2º lugar mundial</b> em consumo de cerveja zero<br>
+    • <b>11,9 piscinas olímpicas</b> produzidas POR DIA
+    </p>
 </div>
 """, unsafe_allow_html=True)
-
-col_q1, col_q2 = st.columns([2, 1])
-
-with col_q1:
-    resposta = st.radio(
-        "Escolha sua resposta:",
-        ["🤔 Não, ainda é nicho", "😐 Mais ou menos, cresceu pouco", "🚀 Sim, explodiu!"],
-        key="quiz1"
-    )
-
-    if st.button("✅ VERIFICAR RESPOSTA", key="reveal1"):
-        if "🚀" in resposta:
-            # Resposta correta
-            if 'quiz1_completo' not in st.session_state.quiz_respondido:
-                pontos_ganhos = ganhar_pontos(25, "Desafio 1 completo!")
-                st.session_state.quiz_respondido['quiz1_completo'] = True
-                if ganhar_badge("🔍 Detetive Zero", "🔍"):
-                    st.success(f"**BADGE DESBLOQUEADA:** 🔍 Detetive Zero!")
-            st.balloons()
-            st.success("**🎉 CORRETO! +25 pontos!**")
-            st.markdown("""
-            <div class="info-box" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 182, 212, 0.2)); border-color: #10b981;">
-                <strong style="color: #10b981; font-size: 1.2rem;">🚀 RESPOSTA: Sim, EXPLODIU!</strong>
-                <p style="margin-top: 0.5rem;">
-                • <b>+537% em 2024:</b> 757 milhões de litros<br>
-                • <b>🏆 2º lugar mundial</b> em consumo de cerveja zero<br>
-                • <b>11,9 piscinas olímpicas</b> produzidas POR DIA
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
-            st.rerun()
-        else:
-            # Resposta errada
-            if st.session_state.vidas > 0:
-                st.session_state.vidas -= 1
-                st.error(f"❌ Não foi dessa vez! Você perdeu 1 vida. Vidas restantes: {'❤️' * st.session_state.vidas}")
-                st.rerun()
-            else:
-                st.warning("💔 Sem vidas! Continue explorando para aprender mais.")
-
-with col_q2:
-    st.metric("Crescimento 2023→2024", "+537%", "638M litros")
-    st.caption("De 119M para 757M litros")
 
 st.markdown("---")
 
@@ -877,57 +756,21 @@ with st.expander("📱 **4. Mudança Cultural e Lei Seca**"):
 
 st.markdown("---")
 
-# Pergunta 3: Quem domina?
+st.markdown("### 🏆 Quem domina o mercado zero no Brasil?")
+
 st.markdown("""
-<div class="missao-card fade-in">
-    <h3 style="color: #f59e0b; margin-top: 0;">🏆 DESAFIO 3: Quem domina o mercado zero no Brasil?</h3>
-    <p style="color: #fbbf24; margin-bottom: 0;">🎁 Recompensa: +50 pontos • 🔴 Dificuldade: Médio</p>
-</div>
-""", unsafe_allow_html=True)
+**Top 3 Marcas Zero (2024):**
 
-col_quiz, col_answer = st.columns([1, 1])
+🥇 **Heineken 0.0** - Líder
+- Lançada em 2020
+- Brasil = mercado estratégico global
 
-with col_quiz:
-    marca_escolhida = st.selectbox(
-        "Escolha a marca líder de cerveja zero:",
-        ["Brahma Zero", "Heineken 0.0", "Budweiser Zero", "Skol Ultra"],
-        key="quiz_marca"
-    )
+🥈 **Budweiser Zero** - +20% em 2024
+- Ambev (lançada em 2022)
 
-    if st.button("✅ VERIFICAR RESPOSTA", key="check_marca"):
-        if marca_escolhida == "Heineken 0.0":
-            # Resposta correta
-            if 'quiz_marca_completo' not in st.session_state.quiz_respondido:
-                ganhar_pontos(50, "Desafio 3 completo!")
-                st.session_state.quiz_respondido['quiz_marca_completo'] = True
-                if ganhar_badge("👑 Expert em Marcas", "👑"):
-                    st.success(f"**BADGE DESBLOQUEADA:** 👑 Expert em Marcas!")
-            st.balloons()
-            st.success("**🎉 PERFEITO! +50 pontos!** 🎯 Heineken 0.0 é a líder absoluta!")
-            st.rerun()
-        else:
-            # Resposta errada
-            if st.session_state.vidas > 0:
-                st.session_state.vidas -= 1
-                st.error(f"❌ Não foi dessa vez! A líder é **Heineken 0.0**. Vidas restantes: {'❤️' * st.session_state.vidas}")
-                st.rerun()
-            else:
-                st.warning("💔 Sem vidas! A resposta correta é: **Heineken 0.0**")
-
-with col_answer:
-    st.markdown("""
-    **Top 3 Marcas Zero (2024):**
-
-    🥇 **Heineken 0.0** - Líder
-    - Lançada em 2020
-    - Brasil = mercado estratégico global
-
-    🥈 **Budweiser Zero** - +20% em 2024
-    - Ambev (lançada em 2022)
-
-    🥉 **Corona Cero** - +20% em 2024
-    - Ambev (lançada em 2022)
-    """)
+🥉 **Corona Cero** - +20% em 2024
+- Ambev (lançada em 2022)
+""")
 
 st.markdown("---")
 
@@ -1384,72 +1227,6 @@ with col2:
 
         st.altair_chart(optimize_chart(brew_donut + labels, 300), use_container_width=True)
 
-# === RANKING FINAL ===
-st.markdown("---")
-st.markdown('<div class="section-title">🏆 Seu Desempenho Final</div>', unsafe_allow_html=True)
-
-nivel_final, nivel_num_final = calcular_nivel(st.session_state.pontos)
-
-col_rank1, col_rank2, col_rank3 = st.columns(3)
-
-with col_rank1:
-    st.markdown(f"""
-    <div class="missao-card">
-        <h3 style="text-align: center; font-size: 3rem; margin: 0;">{st.session_state.pontos}</h3>
-        <p style="text-align: center; color: #a78bfa; font-weight: 700; margin: 0.5rem 0 0 0;">PONTOS TOTAIS</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col_rank2:
-    st.markdown(f"""
-    <div class="missao-card">
-        <h3 style="text-align: center; font-size: 2rem; margin: 0;">{nivel_final}</h3>
-        <p style="text-align: center; color: #a78bfa; font-weight: 700; margin: 0.5rem 0 0 0;">SEU NÍVEL</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col_rank3:
-    badges_total = len(st.session_state.badges)
-    st.markdown(f"""
-    <div class="missao-card">
-        <h3 style="text-align: center; font-size: 3rem; margin: 0;">{badges_total}</h3>
-        <p style="text-align: center; color: #a78bfa; font-weight: 700; margin: 0.5rem 0 0 0;">BADGES CONQUISTADAS</p>
-    </div>
-    """, unsafe_allow_html=True)
-
-# Mensagem motivacional baseada no nível
-if nivel_num_final == 0:
-    mensagem = "🌱 **Iniciante:** Continue explorando o dashboard para subir de nível!"
-elif nivel_num_final == 1:
-    mensagem = "📈 **Conhecedor:** Você está indo bem! Complete mais desafios para se tornar Expert."
-elif nivel_num_final == 2:
-    mensagem = "⭐ **Expert:** Parabéns! Você domina o mercado de cerveja zero. Apenas um passo para Mestre!"
-else:
-    mensagem = "👑 **MESTRE CERVEJEIRO:** Você atingiu o nível máximo! Compartilhe seu conhecimento!"
-
-st.info(mensagem)
-
-# Badges conquistadas
-if len(st.session_state.badges) > 0:
-    st.markdown("### 🎖️ Suas Conquistas")
-    badges_html = " ".join([f"<span class='badge' style='font-size: 3rem;'>{badge}</span>" for badge in st.session_state.badges])
-    st.markdown(f"<div style='text-align: center; padding: 2rem;'>{badges_html}</div>", unsafe_allow_html=True)
-else:
-    st.markdown("""
-    <div class="info-box">
-        <strong>💡 Dica:</strong> Complete os desafios e explore as seções para ganhar badges!
-    </div>
-    """, unsafe_allow_html=True)
-
-# Botão para resetar progresso
-if st.button("🔄 Resetar Progresso e Jogar Novamente"):
-    st.session_state.pontos = 0
-    st.session_state.badges = []
-    st.session_state.quiz_respondido = {}
-    st.session_state.vidas = 3
-    st.session_state.missoes_completas = set()
-    st.success("✨ Progresso resetado! Boa sorte na nova jornada!")
-    st.rerun()
 
 st.markdown("---")
 
