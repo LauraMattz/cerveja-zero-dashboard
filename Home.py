@@ -672,7 +672,7 @@ try:
     df = bundle["unified"]
     meta = bundle["runtime_meta"]
 except Exception as e:
-    st.error("⚠️ Erro ao carregar dados. Pressione 'C' para limpar o cache.")
+    st.error(f"⚠️ Erro ao carregar dados. Pressione 'C' para limpar o cache.\n\n**Detalhe:** `{e}`")
     st.stop()
 
 # Sidebar
