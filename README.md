@@ -137,18 +137,10 @@ pip install plotly>=5.18.0
 pip install -r requirements.txt --upgrade
 ```
 
-## Proximos Passos
-
-- [ ] Integração com banco de dados
-- [ ] Export de relatórios em PDF
-- [ ] Alertas automáticos
-- [ ] Dashboard mobile-friendly
-- [ ] Testes automatizados
-
 ## Licença
 
 MIT — veja o arquivo [LICENSE](LICENSE) para detalhes.
 
 ---
 
-**Versão**: 2.0 | **Última atualização**: Fevereiro 2025
+**Versão**: 2.0 | **Última atualização**: Fevereiro 2026
