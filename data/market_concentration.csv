@@ -1,0 +1,3 @@
+segment,breweries_pct,volume_pct,description
+Top 1%,1.0,50.0,Grandes cervejarias concentram metade da produção
+Microbreweries,99.0,5.0,Microcervejarias representam 99% dos estabelecimentos mas apenas 5% do volume
